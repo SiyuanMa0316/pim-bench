@@ -313,13 +313,17 @@ int main(int argc, char* argv[])
 	CUDA_SAFE_CALL(cudaMemcpy((void*)device_Vect, (void*)host_Vect,vlength*sizeof(double),cudaMemcpyHostToDevice));
 
 	// Launching kernell..........	
-	CUDA_SAFE_CALL(cudaEventRecord (start, 0));
 	
 	int BlocksPerGrid=(matRowSize+BLOCKSIZE-1)/BLOCKSIZE;
         dim3 dimBlock(BLOCKSIZE);
         dim3 dimGrid(BlocksPerGrid);
         //check_block_grid_dim(deviceProp,dimBlock,dimGrid);
 
+        for(int i=0; i<5; i++)
+                MatVectMultiplication<<<(matRowSize+BLOCKSIZE-1)/BLOCKSIZE,BLOCKSIZE>>>(device_Mat,device_Vect,matRowSize,vlength,device_ResVect);
+        
+	CUDA_SAFE_CALL(cudaEventRecord (start, 0));
+	
         int nIter = 300;
         for(int i=0; i<nIter; i++)
                 MatVectMultiplication<<<(matRowSize+BLOCKSIZE-1)/BLOCKSIZE,BLOCKSIZE>>>(device_Mat,device_Vect,matRowSize,vlength,device_ResVect);
@@ -334,7 +338,7 @@ int main(int argc, char* argv[])
         //calculate_gflops(Tsec, matRowSize, matColSize, nIter);
 	
 	//printing the result on screen
-    	print_on_screen("MAT VECT MULTIPLICATION",Tsec,calculate_gflops(Tsec, matRowSize, matColSize, nIter),matRowSize, matColSize,1); 
+    	print_on_screen("MAT VECT MULTIPLICATION",Tsec/nIter,calculate_gflops(Tsec, matRowSize, matColSize, nIter),matRowSize, matColSize,1); 
 
  
 	//retriving result from device
