@@ -42,9 +42,9 @@ void mem_error(char *arrayname, char *benchmark, int len, char *type)
 }
 
 /*calculate Gflops*/
-double calculate_gflops(float &Tsec, int row, int col)
+double calculate_gflops(float &Tsec, int row, int col, int nIter)
 {
-        float gflops=(1.0e-9 * (( 2.0 * row*col )/Tsec));
+        float gflops=(1.0e-9 * (( 1.0 * row*col )*nIter/Tsec));
 	return gflops;
 }
 
@@ -209,9 +209,9 @@ __global__ void MatVectMultiplication(double *device_Mat, double *device_Vect,in
 
         //if(tindex<matRowSize)
 	    //{
-            int i;int m=tindex*vlength;
-	        //device_ResVect[tindex]=1.00;
-	         for(i=0;i<vlength;i++)
+                int i;int m=tindex*vlength;
+	        device_ResVect[tindex]=0;
+	        for(i=0;i<vlength;i++)
 	             device_ResVect[tindex]+=device_Mat[m+i]*device_Vect[i];
 	    //}
 
@@ -227,12 +227,7 @@ void launch_Kernel_MatVectMul()
 /*          threads_per_block, blocks_per_grid  */
 
 
-    int BlocksPerGrid=(matRowSize+BLOCKSIZE-1)/BLOCKSIZE;
-    dim3 dimBlock(BLOCKSIZE);
-    dim3 dimGrid(BlocksPerGrid);
-    //check_block_grid_dim(deviceProp,dimBlock,dimGrid);
-
-    MatVectMultiplication<<<(matRowSize+BLOCKSIZE-1)/BLOCKSIZE,BLOCKSIZE>>>(device_Mat,device_Vect,matRowSize,vlength,device_ResVect);
+    
 
 }
 
@@ -320,7 +315,14 @@ int main(int argc, char* argv[])
 	// Launching kernell..........	
 	CUDA_SAFE_CALL(cudaEventRecord (start, 0));
 	
-	launch_Kernel_MatVectMul();
+	int BlocksPerGrid=(matRowSize+BLOCKSIZE-1)/BLOCKSIZE;
+        dim3 dimBlock(BLOCKSIZE);
+        dim3 dimGrid(BlocksPerGrid);
+        //check_block_grid_dim(deviceProp,dimBlock,dimGrid);
+
+        int nIter = 300;
+        for(int i=0; i<nIter; i++)
+                MatVectMultiplication<<<(matRowSize+BLOCKSIZE-1)/BLOCKSIZE,BLOCKSIZE>>>(device_Mat,device_Vect,matRowSize,vlength,device_ResVect);
 	
 	CUDA_SAFE_CALL(cudaEventRecord (stop, 0));
 	CUDA_SAFE_CALL(cudaEventSynchronize (stop));
@@ -329,10 +331,10 @@ int main(int argc, char* argv[])
 	Tsec= 1.0e-3*elapsedTime;
  	
 	// calling funtion for measuring Gflops
-        calculate_gflops(Tsec, matRowSize, matColSize);
+        //calculate_gflops(Tsec, matRowSize, matColSize, nIter);
 	
 	//printing the result on screen
-    	print_on_screen("MAT VECT MULTIPLICATION",Tsec,calculate_gflops(Tsec, matRowSize, matColSize),matRowSize, matColSize,1); 
+    	print_on_screen("MAT VECT MULTIPLICATION",Tsec,calculate_gflops(Tsec, matRowSize, matColSize, nIter),matRowSize, matColSize,1); 
 
  
 	//retriving result from device
