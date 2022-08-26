@@ -94,6 +94,13 @@ int main (void){
         cublasDestroy(handle);
         return EXIT_FAILURE;
     }
+    stat = cublasSetVector(N, sizeof(*x), x, 1, devY, 1);
+    if (stat != CUBLAS_STATUS_SUCCESS) {
+        printf ("vector data download failed");
+        cudaFree (devY);
+        cublasDestroy(handle);
+        return EXIT_FAILURE;
+    }
 
     //verify copy success
     stat = cublasGetMatrix (M, N, sizeof(*mat), devMat, M, mat, M);
@@ -106,6 +113,11 @@ int main (void){
     stat = cublasGetVector (N, sizeof(*x), devX, 1, x, 1);
     for (i = 0; i < N; i++) {
         printf ("%7.0f", x[i]);
+    }
+    printf ("\n");
+    stat = cublasGetVector (N, sizeof(*x), devY, 1, y, 1);
+    for (i = 0; i < N; i++) {
+        printf ("%7.0f", y[i]);
     }
     printf ("\n");
 
