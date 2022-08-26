@@ -127,7 +127,7 @@ void gpu_blas_mmul(const float *A, const float *B, float *C, const int m, const 
     float elapsedTime;
     CUDA_SAFE_CALL(cudaEventRecord (start, 0));
 
-    int nIter = 300;
+    int nIter = 3000;
     for(int i=0; i<nIter; i++)
         cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
     CUDA_SAFE_CALL(cudaEventRecord (stop, 0));
