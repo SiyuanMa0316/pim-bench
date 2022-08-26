@@ -56,6 +56,8 @@ int main (void){
     float* devY;
     float* y=0;
     y = (float *)malloc(N * sizeof(*y));
+
+
     
     cudaStat = cudaMalloc ((void**)&devMat, M*N*sizeof(*mat));
     if (cudaStat != cudaSuccess) {
@@ -92,7 +94,25 @@ int main (void){
         cublasDestroy(handle);
         return EXIT_FAILURE;
     }
+
+    //verify copy success
+    stat = cublasGetMatrix (M, N, sizeof(*mat), devMat, M, mat, M);
+    for (j = 0; j < N; j++) {
+        for (i = 0; i < M; i++) {
+            printf ("%7.0f", a[IDX2C(i,j,M)]);
+        }
+        printf ("\n");
+    }
+    stat = cublasGetVector (N, sizeof(*x), devX, 1, x, 1);
+    for (i = 0; i < N; i++) {
+        printf ("%7.0f", y[i]);
+    }
+    printf ("\n");
+
+    //do the gemv
     gemvCublas(handle, devMat, devX, devY, M, N);
+
+    //get y
     stat = cublasGetVector (N, sizeof(*y), devY, 1, y, 1);
     if (stat != CUBLAS_STATUS_SUCCESS) {
         printf ("data upload failed");
@@ -104,10 +124,13 @@ int main (void){
     cudaFree (devX);
     cudaFree (devMat);
     cublasDestroy(handle);
+
+    //print y
     for (i = 0; i < N; i++) {
         printf ("%7.0f", y[i]);
     }
     printf ("\n");
+    
     free(y);
     free(x);
     free(mat);
