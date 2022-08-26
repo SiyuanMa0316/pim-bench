@@ -5,7 +5,42 @@
 #include "cublas_v2.h"
 #include <curand.h>
 #include<cuda.h>
-
+/*Check for safe return of all calls to the device */
+void CUDA_SAFE_CALL(cudaError_t call)
+{
+        cudaError_t ret = call;
+        //printf("RETURN FROM THE CUDA CALL:%d\t:",ret);                                        
+        switch(ret)
+        {
+                case cudaSuccess:
+                //              printf("Success\n");                    
+                                break;
+        /*      case cudaErrorInvalidValue:                             
+                                {
+                                printf("ERROR: InvalidValue:%i.\n",__LINE__);
+                                exit(-1);
+                                break;  
+                                }                       
+                case cudaErrorInvalidDevicePointer:                     
+                                {
+                                printf("ERROR:Invalid Device pointeri:%i.\n",__LINE__);
+                                exit(-1);
+                                break;
+                                }                       
+                case cudaErrorInvalidMemcpyDirection:                   
+                                {
+                                printf("ERROR:Invalid memcpy direction:%i.\n",__LINE__);        
+                                exit(-1);
+                                break;
+                                }                       */
+                default:
+                        {
+                                printf(" ERROR at line :%i.%d' ' %s\n",__LINE__,ret,cudaGetErrorString(ret));
+                                exit(-1);
+                                break;
+                        }
+        }
+}
 // Fill the array A(nr_rows_A, nr_cols_A) with random numbers on GPU
 void GPU_fill_rand(float *A, int nr_rows_A, int nr_cols_A) {
     // Create a pseudo-random number generator
@@ -53,17 +88,17 @@ void print_on_screen(char * program_name,float tsec,double gflops,int row, int c
      // Do the actual multiplication
      cudaEvent_t start,stop;
      float elapsedTime;
-     cudaEventRecord (start, 0);
+     CUDA_SAFE_CALL(cudaEventRecord (start, 0));
 
      int nIter = 300;
     for(int i=0; i<nIter; i++)
         cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
-    cudaEventRecord (stop, 0);
-    cudaEventSynchronize (stop);
+    CUDA_SAFE_CALL(cudaEventRecord (stop, 0));
+    CUDA_SAFE_CALL(cudaEventSynchronize (stop));
     
      // Destroy the handle
      cublasDestroy(handle);
-    cudaEventElapsedTime ( &elapsedTime, start, stop);
+    CUDA_SAFE_CALL(cudaEventElapsedTime ( &elapsedTime, start, stop));
     printf("elapsed time = %f\n", elapsedTime);
     float Tsec= 1.0e-3*elapsedTime;	
 	//printing the result on screen  
