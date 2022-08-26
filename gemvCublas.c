@@ -9,7 +9,7 @@
 #define N 5
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
-static __inline__ void gemvCublas (cublasHandle_t handle, const float*A, const float*x, float* y, int M, int N){
+static __inline__ void gemvCublas (cublasHandle_t handle, float*A, float*x, float* y, int M, int N){
     float alpha = 1;
     float beta = 0;
 
@@ -102,7 +102,7 @@ int main (void){
     cudaFree (devX);
     cudaFree (devMat);
     cublasDestroy(handle);
-    for (i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++) {
         printf ("%7.0f", y[i]);
     }
     printf ("\n");
