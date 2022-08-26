@@ -11,15 +11,17 @@
 
 static __inline__ void gemvCublas (cublasHandle_t handle, float*A, float*x, float* y, int m, int n){
     cublasStatus_t stat;
-    float alpha = 1.0;
-    float beta = 1.0;
+    float alf = 1.0;
+    float bet = 1.0;
+    const float *alpha = &alf;
+    const float *beta = &bet;
 
     stat = cublasSgemv( handle, CUBLAS_OP_N,
                            6, 5,
-                           &alpha,
+                           alpha,
                            A, 5,
                            x, 1,
-                           &beta,
+                           beta,
                            y, 1);
     if (stat != CUBLAS_STATUS_SUCCESS) {
         printf ("cublasSgemv failed\n");
