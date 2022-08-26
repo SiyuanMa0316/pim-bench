@@ -11,7 +11,7 @@
 
 static __inline__ void gemvCublas (cublasHandle_t handle, float*A, float*x, float* y, int m, int n){
     float alpha = 1;
-    float beta = 0;
+    float beta = 1;
 
     cublasSgemv( handle, CUBLAS_OP_N,
                            m, n,
