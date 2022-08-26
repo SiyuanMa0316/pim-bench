@@ -61,7 +61,7 @@ void print_on_screen(char * program_name,float tsec,double gflops,int row, int c
  
      // Destroy the handle
      cublasDestroy(handle);
-    cudaEventElapsedTime ( &elapsedTime, start, stop)
+    cudaEventElapsedTime ( &elapsedTime, start, stop);
     float Tsec= 1.0e-3*elapsedTime;	
 	//printing the result on screen  
     print_on_screen("MAT VECT MULTIPLICATION",Tsec/(float)nIter,calculate_gflops(Tsec, m,k,n, nIter),m, k,1);
