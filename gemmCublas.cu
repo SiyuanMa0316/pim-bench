@@ -12,34 +12,70 @@ void CUDA_SAFE_CALL(cudaError_t call)
         //printf("RETURN FROM THE CUDA CALL:%d\t:",ret);                                        
         switch(ret)
         {
-                case cudaSuccess:
-                //              printf("Success\n");                    
-                                break;
-        /*      case cudaErrorInvalidValue:                             
-                                {
-                                printf("ERROR: InvalidValue:%i.\n",__LINE__);
-                                exit(-1);
-                                break;  
-                                }                       
-                case cudaErrorInvalidDevicePointer:                     
-                                {
-                                printf("ERROR:Invalid Device pointeri:%i.\n",__LINE__);
-                                exit(-1);
-                                break;
-                                }                       
-                case cudaErrorInvalidMemcpyDirection:                   
-                                {
-                                printf("ERROR:Invalid memcpy direction:%i.\n",__LINE__);        
-                                exit(-1);
-                                break;
-                                }                       */
-                default:
-                        {
-                                printf(" ERROR at line :%i.%d' ' %s\n",__LINE__,ret,cudaGetErrorString(ret));
-                                exit(-1);
-                                break;
-                        }
-        }
+            case cudaSuccess:
+            //              printf("Success\n");                    
+                            break;
+    /*      case cudaErrorInvalidValue:                             
+                            {
+                            printf("ERROR: InvalidValue:%i.\n",__LINE__);
+                            exit(-1);
+                            break;  
+                            }                       
+            case cudaErrorInvalidDevicePointer:                     
+                            {
+                            printf("ERROR:Invalid Device pointeri:%i.\n",__LINE__);
+                            exit(-1);
+                            break;
+                            }                       
+            case cudaErrorInvalidMemcpyDirection:                   
+                            {
+                            printf("ERROR:Invalid memcpy direction:%i.\n",__LINE__);        
+                            exit(-1);
+                            break;
+                            }                       */
+            default:
+                    {
+                            printf(" ERROR at line :%i.%d' ' %s\n",__LINE__,ret,cudaGetErrorString(ret));
+                            exit(-1);
+                            break;
+                    }
+    }
+}
+
+void CUBLAS_SAFE_CALL(cublasStatus_t call)
+{
+        cublasStatus_t ret = call;
+        //printf("RETURN FROM THE CUDA CALL:%d\t:",ret);                                        
+        switch(ret)
+        {
+            case CUBLAS_STATUS_SUCCESS:
+            //              printf("Success\n");                    
+                            break;
+    /*      case cudaErrorInvalidValue:                             
+                            {
+                            printf("ERROR: InvalidValue:%i.\n",__LINE__);
+                            exit(-1);
+                            break;  
+                            }                       
+            case cudaErrorInvalidDevicePointer:                     
+                            {
+                            printf("ERROR:Invalid Device pointeri:%i.\n",__LINE__);
+                            exit(-1);
+                            break;
+                            }                       
+            case cudaErrorInvalidMemcpyDirection:                   
+                            {
+                            printf("ERROR:Invalid memcpy direction:%i.\n",__LINE__);        
+                            exit(-1);
+                            break;
+                            }                       */
+            default:
+                    {
+                            printf(" CUBLAS ERROR at line :%i.%d' ' %s\n",__LINE__,ret,cudaGetErrorString(ret));
+                            exit(-1);
+                            break;
+                    }
+    }
 }
 // Fill the array A(nr_rows_A, nr_cols_A) with random numbers on GPU
 void GPU_fill_rand(float *A, int nr_rows_A, int nr_cols_A) {
@@ -73,7 +109,7 @@ void print_on_screen(char * program_name,float tsec,double gflops,int row, int c
 
 // Multiply the arrays A and B on GPU and save the result in C
  // C(m,n) = A(m,k) * B(k,n)
-    void gpu_blas_mmul(const float *A, const float *B, float *C, const int m, const int k, const int n) {
+void gpu_blas_mmul(const float *A, const float *B, float *C, const int m, const int k, const int n) {
     int lda=m,ldb=k,ldc=m;
     const float alf = 1;
     const float bet = 0;
@@ -82,7 +118,7 @@ void print_on_screen(char * program_name,float tsec,double gflops,int row, int c
  
     // Create a handle for CUBLAS
     cublasHandle_t handle;
-    cublasCreate(&handle);
+    CUBLAS_SAFE_CALL(cublasCreate(&handle));
  
     // Do the actual multiplication
     cudaEvent_t start,stop;
@@ -106,21 +142,20 @@ void print_on_screen(char * program_name,float tsec,double gflops,int row, int c
     print_on_screen("GEMM",Tsec/(float)nIter,calculate_gflops(Tsec, m,k,n, nIter),m, k,1);
 }
 //Print matrix A(nr_rows_A, nr_cols_A) storage in column-major format
- void print_matrix(const float *A, int nr_rows_A, int nr_cols_A) {
- 
-     for(int i = 0; i < nr_rows_A; ++i){
-         for(int j = 0; j < nr_cols_A; ++j){
-             std::cout << A[j * nr_rows_A + i] << " ";
-         }
-         std::cout << std::endl;
-     }
-     std::cout << std::endl;
- }
+void print_matrix(const float *A, int nr_rows_A, int nr_cols_A) {
+    for(int i = 0; i < nr_rows_A; ++i){
+        for(int j = 0; j < nr_cols_A; ++j){
+            std::cout << A[j * nr_rows_A + i] << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
 int main(int argc, char* argv[]) {
-     // Allocate 3 arrays on CPU
+    // Allocate 3 arrays on CPU
     int nr_rows_A, nr_cols_A, nr_rows_B, nr_cols_B, nr_rows_C, nr_cols_C;
   
-      // for simplicity we are going to use square arrays
+    // for simplicity we are going to use square arrays
     nr_rows_A = atoi(argv[1]);
     nr_cols_A = atoi(argv[2]);
     nr_rows_B = nr_cols_A;
@@ -132,19 +167,19 @@ int main(int argc, char* argv[]) {
     float *h_B = (float *)malloc(nr_rows_B * nr_cols_B * sizeof(float));
     float *h_C = (float *)malloc(nr_rows_C * nr_cols_C * sizeof(float));
  
-     // Allocate 3 arrays on GPU
+    // Allocate 3 arrays on GPU
     float *d_A, *d_B, *d_C;
-    cudaMalloc(&d_A,nr_rows_A * nr_cols_A * sizeof(float));
-    cudaMalloc(&d_B,nr_rows_B * nr_cols_B * sizeof(float));
-    cudaMalloc(&d_C,nr_rows_C * nr_cols_C * sizeof(float));
+    CUDA_SAFE_CALL(cudaMalloc(&d_A,nr_rows_A * nr_cols_A * sizeof(float)));
+    CUDA_SAFE_CALL(cudaMalloc(&d_B,nr_rows_B * nr_cols_B * sizeof(float)));
+    CUDA_SAFE_CALL(cudaMalloc(&d_C,nr_rows_C * nr_cols_C * sizeof(float)));
  
-     // Fill the arrays A and B on GPU with random numbers
+    // Fill the arrays A and B on GPU with random numbers
     GPU_fill_rand(d_A, nr_rows_A, nr_cols_A);
     GPU_fill_rand(d_B, nr_rows_B, nr_cols_B);
  
-     // Optionally we can copy the data back on CPU and print the arrays
-    cudaMemcpy(h_A,d_A,nr_rows_A * nr_cols_A * sizeof(float),cudaMemcpyDeviceToHost);
-    cudaMemcpy(h_B,d_B,nr_rows_B * nr_cols_B * sizeof(float),cudaMemcpyDeviceToHost);
+    // Optionally we can copy the data back on CPU and print the arrays
+    CUDA_SAFE_CALL(cudaMemcpy(h_A,d_A,nr_rows_A * nr_cols_A * sizeof(float),cudaMemcpyDeviceToHost));
+    CUDA_SAFE_CALL(cudaMemcpy(h_B,d_B,nr_rows_B * nr_cols_B * sizeof(float),cudaMemcpyDeviceToHost));
     // std::cout << "A =" << std::endl;
     // print_matrix(h_A, nr_rows_A, nr_cols_A);
     // std::cout << "B =" << std::endl;
@@ -153,8 +188,8 @@ int main(int argc, char* argv[]) {
     // Multiply A and B on GPU
     gpu_blas_mmul(d_A, d_B, d_C, nr_rows_A, nr_cols_A, nr_cols_B);
  
-     // Copy (and print) the result on host memory
-    cudaMemcpy(h_C,d_C,nr_rows_C * nr_cols_C * sizeof(float),cudaMemcpyDeviceToHost);
+    // Copy (and print) the result on host memory
+    CUDA_SAFE_CALL(cudaMemcpy(h_C,d_C,nr_rows_C * nr_cols_C * sizeof(float),cudaMemcpyDeviceToHost));
     // std::cout << "C =" << std::endl;
     // print_matrix(h_C, nr_rows_C, nr_cols_C);
  
