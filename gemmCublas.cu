@@ -56,55 +56,54 @@ void GPU_fill_rand(float *A, int nr_rows_A, int nr_cols_A) {
 
 double calculate_gflops(float &Tsec, int m, int k, int n, int nIter)
 {
-        float gflops=(1.0e-9 * (( 1.0 * m*k*n )*nIter/Tsec));
+    float gflops=(1.0e-9 * (( 1.0 * m*k*n )*nIter/Tsec));
 	return gflops;
 }
 
 /*prints the result in screen*/
 void print_on_screen(char * program_name,float tsec,double gflops,int row, int col, int flag)//flag=1 if gflops has been calculated else flag =0
 {
-        printf("\n---------------%s----------------\n",program_name);
-        printf("\tSIZE\t TIME_SEC\t Gops\n");
-        if(flag==1)
+    printf("\n---------------%s----------------\n",program_name);
+    printf("\tSIZE\t TIME_SEC\t Gops\n");
+    if(flag==1)
         printf("\t%d,%d\t%f\t%lf\t",row, col,tsec,gflops);
-        else
+    else
         printf("\t%d,%d\t%lf\t%lf\t",row, col,"---","---");
-
 }
 
 // Multiply the arrays A and B on GPU and save the result in C
  // C(m,n) = A(m,k) * B(k,n)
-  void gpu_blas_mmul(const float *A, const float *B, float *C, const int m, const int k, const int n) {
+    void gpu_blas_mmul(const float *A, const float *B, float *C, const int m, const int k, const int n) {
     int lda=m,ldb=k,ldc=m;
     const float alf = 1;
     const float bet = 0;
     const float *alpha = &alf;
     const float *beta = &bet;
  
-     // Create a handle for CUBLAS
-     cublasHandle_t handle;
-     cublasCreate(&handle);
+    // Create a handle for CUBLAS
+    cublasHandle_t handle;
+    cublasCreate(&handle);
  
-     // Do the actual multiplication
-     cudaEvent_t start,stop;
-     CUDA_SAFE_CALL(cudaEventCreate (&start));
+    // Do the actual multiplication
+    cudaEvent_t start,stop;
+    CUDA_SAFE_CALL(cudaEventCreate (&start));
     CUDA_SAFE_CALL(cudaEventCreate (&stop));
-     float elapsedTime;
-     CUDA_SAFE_CALL(cudaEventRecord (start, 0));
+    float elapsedTime;
+    CUDA_SAFE_CALL(cudaEventRecord (start, 0));
 
-     int nIter = 300;
+    int nIter = 300;
     for(int i=0; i<nIter; i++)
         cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
     CUDA_SAFE_CALL(cudaEventRecord (stop, 0));
     CUDA_SAFE_CALL(cudaEventSynchronize (stop));
     
-     // Destroy the handle
-     cublasDestroy(handle);
+    // Destroy the handle
+    cublasDestroy(handle);
     CUDA_SAFE_CALL(cudaEventElapsedTime ( &elapsedTime, start, stop));
     printf("elapsed time = %f\n", elapsedTime);
     float Tsec= 1.0e-3*elapsedTime;	
 	//printing the result on screen  
-    print_on_screen("MAT VECT MULTIPLICATION",Tsec/(float)nIter,calculate_gflops(Tsec, m,k,n, nIter),m, k,1);
+    print_on_screen("GEMM",Tsec/(float)nIter,calculate_gflops(Tsec, m,k,n, nIter),m, k,1);
 }
 //Print matrix A(nr_rows_A, nr_cols_A) storage in column-major format
  void print_matrix(const float *A, int nr_rows_A, int nr_cols_A) {
