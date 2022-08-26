@@ -22,8 +22,16 @@ static __inline__ void gemvCublas (cublasHandle_t handle, float*A, float*x, floa
                            &beta,
                            y, 1);
     if (stat != CUBLAS_STATUS_SUCCESS) {
-        printf ("cublasSgemv failed");
-        return EXIT_FAILURE;
+        printf ("cublasSgemv failed\n");
+    }
+    if (stat == CUBLAS_STATUS_NOT_INITIALIZED){
+        printf ("library not initialized\n");
+    }
+    if (stat == CUBLAS_STATUS_INVALID_VALUE){
+        printf ("the parameters m,n<0 or incx,incy=0\n");
+    }
+    if (stat == CUBLAS_STATUS_EXECUTION_FAILED){
+        printf ("the function failed to launch on the GPU\n");
     }
 }
 
