@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include <cstdlib>
 #include <math.h>
 #include <cuda_runtime.h>
