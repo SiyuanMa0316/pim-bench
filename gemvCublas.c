@@ -9,7 +9,7 @@
 #define N 5
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
-static __inline__ void gemvCublas (cublasHandle_t handle, float*A, float*x, float* y, int M, int N){
+static __inline__ void gemvCublas (cublasHandle_t handle, float*A, float*x, float* y, int m, int n){
     float alpha = 1;
     float beta = 0;
 
