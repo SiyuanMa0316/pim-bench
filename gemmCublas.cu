@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <math.h>
 #include <cuda_runtime.h>
 #include "cublas_v2.h"
