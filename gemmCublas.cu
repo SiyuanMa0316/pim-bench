@@ -87,6 +87,8 @@ void print_on_screen(char * program_name,float tsec,double gflops,int row, int c
  
      // Do the actual multiplication
      cudaEvent_t start,stop;
+     CUDA_SAFE_CALL(cudaEventCreate (&start));
+    CUDA_SAFE_CALL(cudaEventCreate (&stop));
      float elapsedTime;
      CUDA_SAFE_CALL(cudaEventRecord (start, 0));
 
