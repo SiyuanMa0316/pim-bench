@@ -99,13 +99,13 @@ int main (void){
     stat = cublasGetMatrix (M, N, sizeof(*mat), devMat, M, mat, M);
     for (j = 0; j < N; j++) {
         for (i = 0; i < M; i++) {
-            printf ("%7.0f", a[IDX2C(i,j,M)]);
+            printf ("%7.0f", mat[IDX2C(i,j,M)]);
         }
         printf ("\n");
     }
     stat = cublasGetVector (N, sizeof(*x), devX, 1, x, 1);
     for (i = 0; i < N; i++) {
-        printf ("%7.0f", y[i]);
+        printf ("%7.0f", x[i]);
     }
     printf ("\n");
 
