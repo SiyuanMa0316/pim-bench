@@ -59,10 +59,11 @@ void print_on_screen(char * program_name,float tsec,double gflops,int row, int c
     for(int i=0; i<nIter; i++)
         cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
     cudaEventRecord (stop, 0);
-    printf("elapsed time = %f\n", elapsedTime);
+    
      // Destroy the handle
      cublasDestroy(handle);
     cudaEventElapsedTime ( &elapsedTime, start, stop);
+    printf("elapsed time = %f\n", elapsedTime);
     float Tsec= 1.0e-3*elapsedTime;	
 	//printing the result on screen  
     print_on_screen("MAT VECT MULTIPLICATION",Tsec/(float)nIter,calculate_gflops(Tsec, m,k,n, nIter),m, k,1);
