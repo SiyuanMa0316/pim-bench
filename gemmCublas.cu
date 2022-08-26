@@ -59,7 +59,7 @@ void print_on_screen(char * program_name,float tsec,double gflops,int row, int c
     for(int i=0; i<nIter; i++)
         cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
     cudaEventRecord (stop, 0);
-    print("elapsed time = %f\n", elapsedTime);
+    printf("elapsed time = %f\n", elapsedTime);
      // Destroy the handle
      cublasDestroy(handle);
     cudaEventElapsedTime ( &elapsedTime, start, stop);
