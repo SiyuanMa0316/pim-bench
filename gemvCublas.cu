@@ -19,7 +19,7 @@ static __inline__ void gemvCublas (cublasHandle_t handle, float*A, float*x, floa
     stat = cublasSgemv( handle, CUBLAS_OP_N,
                            6, 5,
                            alpha,
-                           A, 5,
+                           A, 6,
                            x, 1,
                            beta,
                            y, 1);
