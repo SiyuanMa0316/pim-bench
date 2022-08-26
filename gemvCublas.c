@@ -27,6 +27,8 @@ int main (void){
     cublasStatus_t stat;
     cublasHandle_t handle;
 
+    int i, j;
+
     float* devMat;
     float* mat = 0;
     mat = (float *)malloc (M * N * sizeof (*mat));
@@ -34,8 +36,8 @@ int main (void){
         printf ("host memory allocation failed");
         return EXIT_FAILURE;
     }
-    for (int j = 0; j < N; j++) {
-        for (int i = 0; i < M; i++) {
+    for (j = 0; j < N; j++) {
+        for (i = 0; i < M; i++) {
             mat[IDX2C(i,j,M)] = (float)(i * N + j + 1);
         }
     }
@@ -47,7 +49,7 @@ int main (void){
         printf ("host memory allocation failed");
         return EXIT_FAILURE;
     }
-    for(int i=0; i<N; i++){
+    for(i=0; i<N; i++){
         x[i]=(float)(i+1);
     }
 
