@@ -71,7 +71,7 @@ void CUBLAS_SAFE_CALL(cublasStatus_t call)
                             }                       */
             default:
                     {
-                            printf(" CUBLAS ERROR at line :%i.%d' ' %s\n",__LINE__,ret,cudaGetErrorString(ret));
+                            printf(" CUBLAS ERROR at line :%i.%d' ' %s\n",__LINE__,ret,"cublas error");
                             exit(-1);
                             break;
                     }
