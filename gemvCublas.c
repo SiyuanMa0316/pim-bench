@@ -124,12 +124,9 @@ int main (void){
     cudaFree (devX);
     cudaFree (devMat);
     cublasDestroy(handle);
-<<<<<<< HEAD
-=======
 
     //print y
     for (i = 0; i < N; i++) {
->>>>>>> 2cb2be9584d1faa79213585a65fc82ba43cbcba8
         printf ("%7.0f", y[i]);
     }
     printf ("\n");
